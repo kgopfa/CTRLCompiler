@@ -1,26 +1,27 @@
-use std::io::{self, BufRead};
+use std::io::{ self, BufRead };
+use crate::{ LEXEME_LENGTH, LINE_NUMBER, LEXEME_START };
 use crate::lexer::tokens::Token;
 
 pub fn lex() -> Token {
-    let mut line_number: i32 = 0;
-    let mut lexeme_length: i32 = 0;
-
     loop {
         let mut lexeme: String = String::new();
         let mut lexeme_start: i32 = 0;
 
         match io::stdin().lock().read_line(&mut lexeme) {
-            // @ToDo: Find way to signal end of input as this is C specific
             Err(_error) => return Token::EOI,
             Ok(_lexeme_bytes) => {
                 let line_length: i32 = lexeme.chars().count() as i32;
-                line_number += 1;
 
                 for (i, c) in lexeme.chars().enumerate() {
                     if !c.is_whitespace() {
                         lexeme_start = i as i32;
                         break;
                     }
+                }
+
+                unsafe {
+                    LINE_NUMBER += 1;
+                    LEXEME_START = lexeme_start;
                 }
 
                 let mut iter = lexeme_start;
@@ -48,8 +49,11 @@ pub fn lex() -> Token {
                                     current = lexeme.as_bytes()[iter as usize] as char;
                                     iter += 1;
                                 }
+
+                                unsafe {
+                                    LEXEME_LENGTH = iter - lexeme_start;
+                                }
         
-                                lexeme_length = iter - lexeme_start;
                                 return Token::NUM_OR_ID;
                             }
                             break;
