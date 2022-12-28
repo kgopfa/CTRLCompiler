@@ -1,5 +1,6 @@
 #![allow(non_camel_case_types)]
 
+#[derive(PartialEq)]
 pub enum Token {
     EOI,
     SEMI,
@@ -10,5 +11,6 @@ pub enum Token {
     ASSIGN,
     LP,
     RP,
-    NUM_OR_ID
+    NUM_OR_ID,
+    EMPTY,
 }

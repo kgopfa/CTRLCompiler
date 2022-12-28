@@ -2,6 +2,8 @@ use std::io::{ self, BufRead };
 use crate::{ LEXEME_LENGTH, LINE_NUMBER, LEXEME_START };
 use crate::lexer::tokens::Token;
 
+static mut LOOKAHEAD: Token = Token::EMPTY;
+
 pub fn lex() -> Token {
     loop {
         let mut lexeme: String = String::new();
@@ -62,5 +64,21 @@ pub fn lex() -> Token {
                 }
             }
         }
+    }
+}
+
+fn lookahead_match(token: Token) -> bool {
+    unsafe {
+        if LOOKAHEAD == Token::EMPTY {
+            LOOKAHEAD = lex();
+        }
+
+        return token == LOOKAHEAD;
+    }
+}
+
+fn advance_lookahead() {
+    unsafe {
+        LOOKAHEAD = lex();
     }
 }
